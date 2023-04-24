@@ -4,12 +4,12 @@ void interaction() {
     FileSystem fs;
     cout << "输入 man 以查看各个函数及其功能" << endl;
     while (true) {
-        cout << fs.curNode->getName() << "> ";
+        cout << fs.getCurNode()->getName() << "> ";
         string cmd;
         getline(cin, cmd);
 
         if (cmd == "ls") {
-            fs.showItems(fs.curNode);
+            fs.showItems(fs.getCurNode());
         }
         else if (cmd == "cd ..") {
             fs.cdParent();
@@ -55,7 +55,7 @@ void interaction() {
             fs.loadFromFile(path);
         }
         else if (cmd.substr(0, 5) == "total") {
-            cout << fs.getDirSize(fs.root) << endl;
+            cout << fs.getDirSize(fs.getRoot()) << endl;
         }
         else if (cmd.substr(0, 7) == "rename ") {
             size_t pos = cmd.find(' ');
@@ -63,7 +63,7 @@ void interaction() {
                 string name1 = cmd.substr(7, pos - 7);
                 string name2 = cmd.substr(pos + 1);
                 fs.rename(name1, name2);
-                fs.curNode->getName() = name2;
+                fs.getCurNode()->getName() = name2;
             }
             else {
                 cout << "用法：rename <oldName> <newName>" << endl;
@@ -72,7 +72,7 @@ void interaction() {
         else if (cmd.substr(0, 5) == "copy ") {
             size_t pos = cmd.find(' ');
             if (pos != string::npos) {
-                string src = fs.curNode->getName();
+                string src = fs.getCurNode()->getName();
                 string dest = cmd.substr(pos + 1);
                 fs.copyFile(src, dest);
             }
