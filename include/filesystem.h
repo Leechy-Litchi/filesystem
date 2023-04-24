@@ -13,7 +13,7 @@ using namespace std;
 
 class FileSystem {
 protected:
-  int curBlock;
+  size_t curBlock;
   Node* root;
   Node* curNode;
   void saveToFileRecursion(Node *node, ofstream &ofs);
@@ -35,7 +35,7 @@ public:
   void showPath();
   void saveToFile(string path = "fs.dat");
   void loadFromFile(string path = "fs.dat");
-  unsigned int getDirSize(Node *node);
+  size_t getDirSize(Node *node);
   void rename(string filename1, string filename2);
   void copyFile(string src, string dest);
 

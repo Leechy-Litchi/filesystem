@@ -14,7 +14,7 @@ FileSystem::FileSystem() {
 
 // 显示当前路径
 void FileSystem::showPath() {
-  Node* p = curNode;
+  auto p = curNode;
   cout << root->getName() << "/";
   while (p != root) {
     cout << p->getName() << "/";
@@ -51,7 +51,7 @@ void FileSystem::cdChild(string name) {
 }
 // 在当前目录下新建一个新的空文件
 Node* FileSystem::newFile(string name) {
-  Node* newNode = new Node(name, true, time(NULL), 0, ++curBlock, curNode);
+  auto newNode = new Node(name, true, time(NULL), 0, ++curBlock, curNode);
   curNode->getChildren()->push_back(newNode);
   return newNode;
 }
@@ -70,7 +70,7 @@ void FileSystem::deleteFile(string name) {
 
 // 在当前目录下创建一个新文件夹
 void FileSystem::newDir(string name) {
-  Node* newNode = new Node(name, false, time(NULL), 0, ++curBlock, curNode);
+  auto newNode = new Node(name, false, time(NULL), 0, ++curBlock, curNode);
   curNode->getChildren()->push_back(newNode);
 }
 
@@ -129,10 +129,10 @@ void FileSystem::loadFromFileRecursion(ifstream& ifs, Node* curNode) {
   string name, parentName;
   bool isFile;
   time_t ctime;
-  int size, firstBlock;
+  size_t size, firstBlock;
   iss >> name >> isFile >> ctime >> size >> firstBlock >> parentName;
 
-  Node* child =
+  auto child =
     new Node(name, isFile, ctime, size, firstBlock, findDir(parentName));
 
   if (name != "root") {
@@ -153,7 +153,7 @@ Node* FileSystem::findDir(string name) {
   if (name == "root" or name == "null") {
     return root;
   }
-  Node* res = findDirRecursion(root, name);
+  auto res = findDirRecursion(root, name);
   return res;
 }
 
@@ -162,7 +162,7 @@ Node* FileSystem::findDirRecursion(Node* node, string name) {
     return node;
   }
   for (auto child : *node->getChildren()) {
-    Node* res = findDirRecursion(child, name);
+    auto res = findDirRecursion(child, name);
     if (res != nullptr) {
       return res;
     }
@@ -184,8 +184,8 @@ Node* FileSystem::findFile(string name) {
 }
 
 // 计算当前目录下文件总大小
-unsigned int FileSystem::getDirSize(Node* node) {
-  unsigned int size = 0;
+size_t FileSystem::getDirSize(Node* node) {
+  size_t size = 0;
   for (auto child : *node->getChildren()) {
       size += child->getIsFile()?child->getSize():getDirSize(child);
   }
@@ -194,13 +194,13 @@ unsigned int FileSystem::getDirSize(Node* node) {
 
 // 重命名文件或目录
 void FileSystem::rename(string filename1, string filename2) {
-  Node* file1 = findFile(filename1);
+  auto file1 = findFile(filename1);
   if (file1 == nullptr) {
     cout << "文件不存在：" << filename1 << endl;
     return;
   }
 
-  Node* file2 = findFile(filename2);
+  auto file2 = findFile(filename2);
   if (file2 != nullptr) {
     cout << "文件已存在：" << filename2 << endl;
     return;
@@ -211,8 +211,8 @@ void FileSystem::rename(string filename1, string filename2) {
 
 // 复制文件
 void FileSystem::copyFile(string src, string dest) {
-  Node* srcNode = findFile(src);
-  Node* destNode = findFile(dest);
+  auto srcNode = findFile(src);
+  auto destNode = findFile(dest);
   if (srcNode != nullptr && destNode == nullptr && srcNode->getIsFile()) {
     destNode =
       new Node(dest, srcNode->getIsFile(), time(NULL), srcNode->getSize(),

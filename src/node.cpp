@@ -11,10 +11,10 @@ void Node::setIsFile(bool isFile) {
 void Node::setCtime(time_t ctime) {
     this->ctime = ctime;
 }
-void Node::setSize(int size) {
+void Node::setSize(size_t size) {
     this->size = size;
 }
-void Node::setFirstBlock(int firstBlock) {
+void Node::setFirstBlock(size_t firstBlock) {
     this->firstBlock = firstBlock;
 }
 void Node::setParent(Node* parent) {
@@ -34,10 +34,10 @@ bool Node::getIsFile() {
 time_t Node::getCtime() {
     return ctime;
 }
-int Node::getSize() {
+size_t Node::getSize() {
     return size;
 }
-int Node::getFirstBlock() {
+size_t Node::getFirstBlock() {
     return firstBlock;
 }
 Node* Node::getParent() {
@@ -47,7 +47,7 @@ vector<Node*>* Node::getChildren() {
     return &children;
 }
 Node::Node() {}
-Node::Node(string name, bool isFile, time_t ctime, int size, int firstBlock, Node* parent) {
+Node::Node(string name, bool isFile, time_t ctime, size_t size, size_t firstBlock, Node* parent) {
     this->name = name;          // 文件名或目录名
     this->isFile = isFile;          // 文件或目录
     this->ctime = ctime;         // 创建时间 
