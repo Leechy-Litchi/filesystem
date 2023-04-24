@@ -1,25 +1,20 @@
 #include "filesystem.h"
 
+// Getter 方法
+Node* FileSystem::getCurNode() { return curNode; };
+Node* FileSystem::getRoot() { return root; };
+
 FileSystem::FileSystem() {
   curBlock = 0;
   root = new Node("root", false, time(NULL), 0, ++curBlock, root);
   root->setParent(root);
-  root->setChildren(vector<Node *>());
+  root->setChildren(vector<Node*>());
   curNode = root;
 }
 
-// Getter
-
-Node* FileSystem::getCurNode(){
-  return curNode;
-};
-Node* FileSystem::getRoot(){
-  return root;
-};
-
 // 显示当前路径
 void FileSystem::showPath() {
-  Node *p = curNode;
+  Node* p = curNode;
   cout << root->getName() << "/";
   while (p != root) {
     cout << p->getName() << "/";
@@ -29,12 +24,11 @@ void FileSystem::showPath() {
 }
 
 // 显示当前路径下所有文件和目录
-void FileSystem::showItems(Node *curNode) {
+void FileSystem::showItems(Node* curNode) {
   if (curNode == nullptr)
     return; // 检查 curNode 指针
 
-  cout << (curNode->getIsFile() ? "FILE: " : "DIR: ");
-  cout << curNode->getName() << endl;
+  cout << (curNode->getIsFile() ? "FILE: " : "DIR: ") << curNode->getName() << endl;
 
   for (auto child : *curNode->getChildren()) {
     if (child->getName() != "") {
@@ -56,8 +50,8 @@ void FileSystem::cdChild(string name) {
   }
 }
 // 在当前目录下新建一个新的空文件
-Node *FileSystem::newFile(string name) {
-  Node *newNode = new Node(name, true, time(NULL), 0, ++curBlock, curNode);
+Node* FileSystem::newFile(string name) {
+  Node* newNode = new Node(name, true, time(NULL), 0, ++curBlock, curNode);
   curNode->getChildren()->push_back(newNode);
   return newNode;
 }
@@ -65,9 +59,9 @@ Node *FileSystem::newFile(string name) {
 // 在当前目录下删除一个文件
 void FileSystem::deleteFile(string name) {
   for (auto it = curNode->getChildren()->begin();
-       it != curNode->getChildren()->end(); ++it) {
+    it != curNode->getChildren()->end(); ++it) {
     if ((*it)->getName() == name && (*it)->getIsFile()) {
-      delete *it;
+      delete* it;
       curNode->getChildren()->erase(it);
       return;
     }
@@ -76,16 +70,16 @@ void FileSystem::deleteFile(string name) {
 
 // 在当前目录下创建一个新文件夹
 void FileSystem::newDir(string name) {
-  Node *newNode = new Node(name, false, time(NULL), 0, ++curBlock, curNode);
+  Node* newNode = new Node(name, false, time(NULL), 0, ++curBlock, curNode);
   curNode->getChildren()->push_back(newNode);
 }
 
 // 在当前目录下删除一个文件夹
 void FileSystem::deleteDir(string name) {
   for (auto it = curNode->getChildren()->begin();
-       it != curNode->getChildren()->end(); ++it) {
+    it != curNode->getChildren()->end(); ++it) {
     if ((*it)->getName() == name && !(*it)->getIsFile()) {
-      delete *it; // 递归删除子文件和子目录
+      delete* it; // 递归删除子文件和子目录
       curNode->getChildren()->erase(it);
       return;
     }
@@ -97,14 +91,12 @@ void FileSystem::saveToFile(string path) {
   ofstream ofs(path);
   saveToFileRecursion(this->root, ofs);
 }
-void FileSystem::saveToFileRecursion(Node *node, ofstream &ofs) {
-  char blockStr[10];
-  sprintf(blockStr, "%d", node->getFirstBlock());
-
+void FileSystem::saveToFileRecursion(Node* node, ofstream& ofs) {
   ofs << node->getName() << ' ' << node->getIsFile() << ' ' << node->getCtime()
-      << ' ' << node->getSize() << ' ' << blockStr << ' '
-      << (node->getParent() == nullptr ? "null" : node->getParent()->getName())
-      << endl;
+    << ' ' << node->getSize() << ' ' << node->getFirstBlock() << ' '
+    << (node->getParent() == nullptr ? "null" : node->getParent()->getName())
+    << endl;
+
   for (auto child : *node->getChildren()) {
     saveToFileRecursion(child, ofs);
   }
@@ -124,7 +116,7 @@ void FileSystem::loadFromFile(string path) {
 
   loadFromFileRecursion(ifs, root);
 }
-void FileSystem::loadFromFileRecursion(ifstream &ifs, Node *curNode) {
+void FileSystem::loadFromFileRecursion(ifstream& ifs, Node* curNode) {
   if (curNode == nullptr) {
     return;
   }
@@ -140,13 +132,13 @@ void FileSystem::loadFromFileRecursion(ifstream &ifs, Node *curNode) {
   int size, firstBlock;
   iss >> name >> isFile >> ctime >> size >> firstBlock >> parentName;
 
-  Node *child =
-      new Node(name, isFile, ctime, size, firstBlock, findDir(parentName));
+  Node* child =
+    new Node(name, isFile, ctime, size, firstBlock, findDir(parentName));
 
   if (name != "root") {
     curNode->setSize(curNode->getSize() + size);
     curNode->getChildren()->push_back(child);
-  } else {
+  }else {
     curNode = child;
     child = curNode;
     child->setParent(child);
@@ -157,96 +149,74 @@ void FileSystem::loadFromFileRecursion(ifstream &ifs, Node *curNode) {
   }
 }
 
-Node *FileSystem::findDir(string name) {
+Node* FileSystem::findDir(string name) {
   if (name == "root" or name == "null") {
     return root;
   }
-  Node *res = findDirRecursion(root, name);
+  Node* res = findDirRecursion(root, name);
   return res;
 }
 
-Node *FileSystem::findDirRecursion(Node *node, string name) {
+Node* FileSystem::findDirRecursion(Node* node, string name) {
   if (node->getName() == name && !node->getIsFile()) {
     return node;
   }
   for (auto child : *node->getChildren()) {
-    Node *res = findDirRecursion(child, name);
+    Node* res = findDirRecursion(child, name);
     if (res != nullptr) {
       return res;
+    }
+  }
+  return nullptr;
+}
+
+// 查找文件，返回文件节点
+Node* FileSystem::findFile(string name) {
+  if (curNode->getName() == name) {
+    return curNode;
+  }
+  for (auto child : *curNode->getChildren()) {
+    if (child->getName() == name) {
+      return child;
     }
   }
   return nullptr;
 }
 
 // 计算当前目录下文件总大小
-int FileSystem::getDirSize(Node *node) {
-  int size = 0;
+unsigned int FileSystem::getDirSize(Node* node) {
+  unsigned int size = 0;
   for (auto child : *node->getChildren()) {
-    if (child->getIsFile())
-      size += child->getSize();
-    else
-      size += getDirSize(child);
+      size += child->getIsFile()?child->getSize():getDirSize(child);
   }
   return size;
 }
 
-// 查找文件，返回文件节点
-Node *FileSystem::findFile(string name) {
-  Node *curNode = root;
-  while (curNode != nullptr) {
-    if (curNode->getName() == name) {
-      return curNode;
-    }
-
-    if (!curNode->getIsFile()) {
-      for (auto child : *curNode->getChildren()) {
-        if (child->getName() == name) {
-          return child;
-        }
-      }
-      curNode = nullptr;
-    }
-  }
-  return nullptr;
-}
-
 // 重命名文件或目录
 void FileSystem::rename(string filename1, string filename2) {
-  Node *file1 = findFile(filename1);
+  Node* file1 = findFile(filename1);
   if (file1 == nullptr) {
     cout << "文件不存在：" << filename1 << endl;
     return;
   }
 
-  Node *file2 = findFile(filename2);
+  Node* file2 = findFile(filename2);
   if (file2 != nullptr) {
     cout << "文件已存在：" << filename2 << endl;
     return;
   }
 
-  file1->getName() = filename2;
-}
-Node *FileSystem::findFileRecursion(Node *node, string name) {
-  if (node->getName() == name)
-    return node;
-
-  for (auto child : *node->getChildren()) {
-    Node *res = findFileRecursion(child, name);
-    if (res != nullptr) {
-      return res;
-    }
-  }
-  return nullptr;
+  file1->setName(filename2);
 }
 
 // 复制文件
 void FileSystem::copyFile(string src, string dest) {
-  Node *srcNode = findFile(src);
-  Node *destNode = findFile(dest);
+  Node* srcNode = findFile(src);
+  Node* destNode = findFile(dest);
   if (srcNode != nullptr && destNode == nullptr && srcNode->getIsFile()) {
     destNode =
-        new Node(dest, srcNode->getIsFile(), time(NULL), srcNode->getSize(),
-                 srcNode->getFirstBlock(), srcNode->getParent());
+      new Node(dest, srcNode->getIsFile(), time(NULL), srcNode->getSize(),
+        srcNode->getFirstBlock(), srcNode->getParent());
     srcNode->getParent()->getChildren()->push_back(destNode);
   }
 };

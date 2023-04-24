@@ -54,5 +54,4 @@ Node::Node(string name, bool isFile, time_t ctime, int size, int firstBlock, Nod
     this->size = size;             // 文件大小 
     this->firstBlock = firstBlock;       // 首块磁盘号
     this->parent = parent;         // 父目录
-
 };

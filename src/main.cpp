@@ -1,5 +1,4 @@
 #include "Filesystem.h"
-
 void interaction() {
     FileSystem fs;
     cout << "输入 man 以查看各个函数及其功能" << endl;
@@ -7,7 +6,6 @@ void interaction() {
         cout << fs.getCurNode()->getName() << "> ";
         string cmd;
         getline(cin, cmd);
-
         if (cmd == "ls") {
             fs.showItems(fs.getCurNode());
         }
@@ -30,7 +28,6 @@ void interaction() {
             cin >> size;
             file->setSize(size);
             fflush(stdin);
-            // system("cls");
         }
         else if (cmd.substr(0, 6) == "rm -r ") {
             fs.deleteDir(cmd.substr(6));
@@ -55,18 +52,17 @@ void interaction() {
             fs.loadFromFile(path);
         }
         else if (cmd.substr(0, 5) == "total") {
-            cout << fs.getDirSize(fs.getRoot()) << endl;
+            cout << fs.getDirSize(fs.getCurNode()) << endl;
         }
         else if (cmd.substr(0, 7) == "rename ") {
-            size_t pos = cmd.find(' ');
-            if (pos != string::npos) {
-                string name1 = cmd.substr(7, pos - 7);
-                string name2 = cmd.substr(pos + 1);
-                fs.rename(name1, name2);
-                fs.getCurNode()->getName() = name2;
+            cmd = cmd.substr(7);
+            string filename1 = cmd.substr(0,cmd.find(' '));
+            if (filename1 != "") {
+                string filename2 = cmd.substr(cmd.find(" ")+1);
+                fs.rename(filename1, filename2);
             }
             else {
-                cout << "用法：rename <oldName> <newName>" << endl;
+                cout << "用法:rename <oldName> <newName>" << endl;
             }
         }
         else if (cmd.substr(0, 5) == "copy ") {
